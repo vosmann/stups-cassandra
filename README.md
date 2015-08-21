@@ -1,18 +1,19 @@
 # STUPS Cassandra
-----
 
-STUPS Cassandra is a Senza appliance enabling quick Cassandra cluster creation 
-and basic node failure handling for the [STUPS](https://stups.io) environment.
+STUPS Cassandra is a [Senza](https://stups.io/senza/) appliance for the 
+[STUPS](https://stups.io) AWS environment.
+It enables quick boostrapping of Cassandra clusters and basic node failure handling.
 
 Due to the dynamic nature of the STUPS environment this appliance does seed 
-discovery using etcd and a custom seed provider, the 
-[Etcd Seed Provider](https://github.com/zalando/cassandra-etcd-seed-provider).
+registration and discovery using etcd. To support this we built a custom seed
+provider, the [Etcd Seed Provider]
+(https://github.com/zalando/cassandra-etcd-seed-provider).
 
 The steps below explain how to get your own Cassandra cluster up and running.
-If you already have your own etcd appliance running this can be achieve in one 
-single step.
+If you already have your own etcd appliance running this can be achieve with
+one single command!
 
-Additionaly, the cluster will register itself into an existing [STUPS Opscenter]
+Additionaly, the cluster can register itself into an existing [STUPS Opscenter]
 (https://github.com/zalando/stups-opscenter) appliance.
 
 ## Node configuration
@@ -42,27 +43,34 @@ defaults with values that better match your own requirements.
     | ApplicationId  | The application id according to yourturn                         | stups-cassandra     |
     +----------------+------------------------------------------------------------------+---------------------+
 
-        
+### EtcdDomain
+
 The only mandatory parameter is the ``EtcdDomain``. The Cassandra cluster will 
-bootstrap one node at a time carefully registering a reasonable amount of seed
+bootstrap one node at a time, carefully registering a reasonable amount of seed
 nodes. Such registrarion and the required distributed locking is done using etcd.
 If you followed the instructions from 
 [Spilo](http://spilo.readthedocs.org/en/latest/user-guide/deploy_etcd/) 
 you'll have an Etcd domain similar to etcd.<my-team-name>.<domain>.
 This is the value you need to specify here.
 
-All the remaining parameters have defaults and you don't need to override them
+All the remaining parameters have defaults and you don't need to override them,
 unless you want to. 
 
-The default cluster size is 3 nodes which will elect one of them as the single
+### ClusterSize
+
+The default cluster size is 3 nodes. With this setting there will be a single
 seed node in the cluster. For such a modest cluster this can be considered
 acceptable. If you increase the cluster size to anything bigger than 3 nodes it
-will elect 3 nodes to become seeds nodes.
+will elect 3 nodes to become seeds nodes. You define the cluster size using the
+``ClusterSize`` parameter.
 
-This appliance will be kept in sync with the latest Docker image deployed to 
+### ImageVersion
+
+This appliance will be kept in sync with the latest Docker image deployed to the
 STUPS Open Source Docker Registry (os-registry.stups.zalan.do). You can still
-override this version to some other existing image if you need to, using the
-``ImageVersion`` parameter.
+override the image version to some other version using the ``ImageVersion`` parameter.
+
+### OpsCenterIp
 
 If you want to manually specify the IP address of your existing Opscenter
 installation you can do so by specifying the ``OpsCenterIp`` parameter. If you
@@ -70,28 +78,37 @@ created your OpsCenter instance using the [STUPS Opscenter]
 (https://github.com/zalando/stups-opscenter) appliance you can leave the default
 and the nodes will discover the OpsCenter appliance and register there.
 
+### ScalyrKey
+
 If you're using Scalyr, one of the supported log shipping providers from Taupage, 
 you can specify your Scalyr API key and it will be used to ship your node logs.
-Leaving it blank will just keep them locally and you'll have to SSH into the
-nodes to check them.
+For this you specify the value of the ``ScalyrKey`` parameter. if you leave it 
+blank logs will be kept locally and you'll have to SSH into the nodes to check them.
 
-It's also possible that you created your own application record in YourTurn for
-auditing purposes. If this is the case you can also override the ``ApplicationId``
-parameter specifying your own application id.
+### ApplicationId
+
+It's also possible that you created your own application record in [YourTurn]
+(https://stups.io/yourturn/) for auditing purposes. If this is the case you 
+can also override the ``ApplicationId`` parameter specifying your own 
+application id.
 
 ## Howto
 
 Creating an instance of this appliance is very easy. You just need to provide 1
 parameter which is your etcd domain. Assuming your team's Hosted Zone is
-``cassandra.rocks.org`` and your etcd domain is ``etcd.cassandra.rocks.org``
+``fsociety.example.com`` and your etcd domain is ``etcd.fsociety.example.com``
 you would run senza like:
 
-    senza create stups-cassandra.yaml cluster1 etcd.cassandra.rocks.org
+    senza create stups-cassandra.yaml cluster1 etcd.fsociety.example.com
     
-Where ``cluster1`` is the Stack version and is also used as the cluster name 
+Where ``cluster1`` is the Stack version and it's also used as the name 
 for the new cluster.
 
 
 ## Known issues
 
-- Each new node will try to register the cluster again. This is harmless but stupid.
+- After the first seed node, each new node will try to register the cluster again. This is harmless but stupid.
+
+## Todo
+
+- Advanced failure management, particularly to replace dead seed nodes

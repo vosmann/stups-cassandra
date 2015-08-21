@@ -12,7 +12,7 @@ The steps below explain how to get your own Cassandra cluster up and running.
 If you already have your own etcd appliance running this can be achieve in one 
 single step.
 
-Additionaly, the cluster will register itself an existing [STUPS Opscenter]
+Additionaly, the cluster will register itself into an existing [STUPS Opscenter]
 (https://github.com/zalando/stups-opscenter) appliance.
 
 ## Node configuration

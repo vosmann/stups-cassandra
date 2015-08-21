@@ -1,0 +1,107 @@
+SenzaInfo:
+  StackName: cassandra
+  Parameters:
+    - EtcdDomain:
+        Description: "Your etcd domain (e.g. etcd.cassandra.rocks.org)"
+    - ClusterSize:
+        Description: "The initial size (number of nodes) for the new Cassandra cluster"
+        Default: "3"
+    - ImageVersion:
+        Description: "Which Image version to use (e.g. 2.1.8-p0)"
+        Default: "2.1.8-p0-SNAPSHOT"
+    - OpsCenterIp:
+        Description: "Register to Opscenter using Ip address"
+        Default: ""
+    - ScalyrKey:
+        Description: "The API key of Scalyr logging service used by Taupage"
+        Default: ""
+    - ApplicationId:
+        Description: "The application id according to yourturn"
+        Default: "stups-cassandra"
+      
+SenzaComponents:
+
+  - Configuration:
+      Type: Senza::StupsAutoConfiguration
+
+  - CassandraCluster:
+      Type: Senza::TaupageAutoScalingGroup
+      InstanceType: "c3.2xlarge" # Has 2 80GB SSDs
+      SecurityGroups:
+        - Fn::GetAtt:
+          - StupsCassandraSg
+          - GroupId
+      AutoScaling:
+        Minimum: "{{Arguments.ClusterSize}}"
+        Maximum: "{{Arguments.ClusterSize}}"
+        MetricType: CPU
+      TaupageConfig:
+        root: true
+
+        runtime: Docker
+        networking: host
+        source: "os-registry.stups.zalan.do/mop/stups-cassandra:{{Arguments.ImageVersion}}"
+        application_id: "{{Arguments.ApplicationId}}"
+        etcd_discovery_domain: "{{Arguments.EtcdDomain}}"
+        scalyr_account_key: "{{Arguments.ScalyrKey}}"
+
+        # http://docs.datastax.com/en/opscenter/5.0/opsc/reference/opscPorts_r.html
+        ports:
+          7000: 7000
+          7199: 7199
+          9042: 9042
+          9160: 9160
+          61621: 61621
+        volumes:
+          raid:
+            /dev/md/cassandra:
+              level: 0
+              devices:
+                - /dev/xvdb
+                - /dev/xvdc
+        mounts:
+          /tmp:
+            erase_on_boot: false
+          /var/cassandra:
+            partition: /dev/md/cassandra
+            filesystem: ext4
+            erase_on_boot: true
+
+        environment:
+          CLUSTER_NAME: "{{SenzaInfo.StackVersion}}"
+          CLUSTER_SIZE: "{{Arguments.ClusterSize}}"
+          OPSCENTER: "{{Arguments.OpsCenterIp}}"
+          TTL: 120
+
+Resources:
+  StupsCassandraSg:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Cassandra node ports
+      SecurityGroupIngress:
+      - IpProtocol: tcp # Client CQL
+        FromPort: 9042
+        ToPort: 9042
+        CidrIp: 0.0.0.0/0
+      - IpProtocol: tcp # Client Thrift
+        FromPort: 9160
+        ToPort: 9160
+        CidrIp: 0.0.0.0/0
+      - IpProtocol: tcp # Cassandra inter-node communication
+        FromPort: 7000
+        ToPort: 7000
+        CidrIp: 0.0.0.0/0
+      - IpProtocol: tcp # JMX from everywhere
+        FromPort: 7199
+        ToPort: 7199
+        CidrIp: 0.0.0.0/0
+      - IpProtocol: tcp # Agent receiving traffic from OpsCenter
+        FromPort: 61621
+        ToPort: 61621
+        CidrIp: 0.0.0.0/0
+      - IpProtocol: tcp # SSH
+        FromPort: 22
+        ToPort: 22
+        CidrIp: 0.0.0.0/0
+
+

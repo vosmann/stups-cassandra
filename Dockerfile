@@ -1,4 +1,4 @@
-FROM zalando/openjdk:8u45-b14-3
+FROM pierone.stups.zalan.do/zaster/ubuntu14.04_pam_hf:1.0
 
 MAINTAINER Zalando <team-mop@zalando.de>
 

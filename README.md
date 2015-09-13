@@ -94,16 +94,17 @@ application id.
 
 ## Howto
 
-Creating an instance of this appliance is very easy. You just need to provide 1
-parameter which is your etcd domain. Assuming your team's Hosted Zone is
+Creating an instance of this appliance is very easy. You just need to provide one 
+simple parameter which is your etcd domain. Assuming your team's Hosted Zone is
 ``fsociety.example.com`` and your etcd domain is ``etcd.fsociety.example.com``
-you would run senza like:
+you would run senza like this:
 
     senza create stups-cassandra.yaml cluster1 etcd.fsociety.example.com
     
 Where ``cluster1`` is the Stack version and it's also used as the name 
 for the new cluster.
 
+If you need additional help about senza you can [check the documentation](https://docs.stups.io/en/latest/components/senza.html#command-line-usage).
 
 ## Known issues
 

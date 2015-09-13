@@ -10,7 +10,7 @@ provider, the [Etcd Seed Provider]
 (https://github.com/zalando/cassandra-etcd-seed-provider).
 
 The steps below explain how to get your own Cassandra cluster up and running.
-If you already have your own etcd appliance running this can be achieve with
+If you already have your own etcd appliance running this can be achieved with
 one single command!
 
 Additionaly, the cluster can register itself into an existing [STUPS Opscenter]

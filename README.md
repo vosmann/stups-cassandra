@@ -82,8 +82,8 @@ and the nodes will discover the OpsCenter appliance and register there.
 
 If you're using Scalyr, one of the supported log shipping providers from Taupage, 
 you can specify your Scalyr API key and it will be used to ship your node logs.
-For this you specify the value of the ``ScalyrKey`` parameter. if you leave it 
-blank logs will be kept locally and you'll have to SSH into the nodes to check them.
+For this you specify the value of the ``ScalyrKey`` parameter. If you leave this parameter 
+blank, logs will be kept locally and you'll have to SSH into the nodes to check them.
 
 ### ApplicationId
 

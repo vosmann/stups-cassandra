@@ -39,15 +39,14 @@ if [ "$commando" != "backup" ] && [ "$commando" != "restore" ] && [ "$commando" 
 fi 
 
 if [ "$commando" == "backup" ]; then
-	cd /tmp/
-	echo 'Creating snapshot'
-	`$CASSANDRA_HOME/bin/nodetool snapshot`
-	echo "Moving file to S3 Bucket $bucket"
-	`aws s3 cp /var/cassandra/data/$keySpaceName $bucket/$DATE/$IP --recursive`
-	echo "Cleanup"
-	`rm -f $backupFolder/snapshot/*`
-	echo "Done with snapshot"
-else 
+        echo "Creating snapshot for keyspace $keySpaceName"
+        /opt/cassandra/bin/nodetool snapshot
+        echo "Moving file to S3 Bucket $bucket"
+        aws s3 cp /var/cassandra/data/$keySpaceName s3://$bucket/$APPLICATION_ID/$DATE/$IP --recursive
+        echo "Cleanup"
+        `rm -f $backupFolder/snapshot/*`
+        echo "Done with snapshot"
+else
 			echo "Quit Script"
 			exit 0;
 fi

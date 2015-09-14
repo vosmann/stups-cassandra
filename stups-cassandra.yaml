@@ -51,7 +51,6 @@ SenzaComponents:
         application_id: "{{Arguments.ApplicationId}}"
         etcd_discovery_domain: "{{Arguments.EtcdDomain}}"
         scalyr_account_key: "{{Arguments.ScalyrKey}}"
-
         # http://docs.datastax.com/en/opscenter/5.0/opsc/reference/opscPorts_r.html
         ports:
           7000: 7000
@@ -79,6 +78,9 @@ SenzaComponents:
           CLUSTER_SIZE: "{{Arguments.ClusterSize}}"
           OPSCENTER: "{{Arguments.OpsCenterIp}}"
           TTL: 120
+          BACKUP_BUCKET: "{{Arguments.BackupBucket}}"
+          APPLICATION_ID: "{{Arguments.ApplicationId}}"
+
 
 Resources:
   StupsCassandraSg:

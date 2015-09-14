@@ -26,7 +26,12 @@ fi
 if [ -z "$LISTEN_ADDRESS" ] ;
 then
     export LISTEN_ADDRESS=$(curl -Ls -m 4 http://169.254.169.254/latest/meta-data/local-ipv4)
+    if [ -z $LISTEN_ADDRESS ] ;
+        then
+        export LISTEN_ADDRESS=`hostname -I | awk '{print $1}'`
+    fi
 fi
+
 echo "Node IP address is $LISTEN_ADDRESS ..."
 
 # TODO: Use diff. Snitch if Multi-Region
@@ -45,6 +50,12 @@ export COMMIT_LOG_DIR=${COMMIT_LOG_DIR:-/var/cassandra/data/commit_logs}
             
 curl -s "${ETCD_URL}/v2/keys/cassandra/${CLUSTER_NAME}/size?prevExist=false" \
     -XPUT -d value=${CLUSTER_SIZE} > /dev/null
+
+if [ -n "$BACKUP_BUCKET" ] ;
+then 
+    curl -s "${ETCD_URL}/v2/keys/cassandra/${CLUSTER_NAME}/snapshot_pattern/" \
+      -XPUT -d value='05 ?' > /dev/null        
+fi
 
 while true; do 
     curl -Lsf "${ETCD_URL}/v2/keys/cassandra/${CLUSTER_NAME}/_bootstrap?prevExist=false" \

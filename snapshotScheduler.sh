@@ -14,11 +14,11 @@ while [ -n "$BACKUP_BUCKET" ] ; do
                 KEYSPACES=("${KEYSPACES[@]/system}")
                         if  [[ "${EXECUTE_PATTERN[0]}" == "?" || "${EXECUTE_PATTERN[0]}" == "$MINUTE" ]] ; then
                                 if [[ "${EXECUTE_PATTERN[1]}" == "?" || "${EXECUTE_PATTERN[1]}" == "$HOUR" ]] ; then
-                                #Execute the actual script for taking a snapshot
+                                #Execute the actual script for taking a snapshot                              
                                 for i in "${KEYSPACES[@]}"
                                         do
                                         echo "Executing snapshot"
-                                        /opt/cassandra/bin/cassandraSnapshotter.sh backup $i $BACKUP_BUCKET >> /var/log/snapshot_cron.log
+                                        flock -x -n /opt/cassandra/bin/cassandraSnapshotter.sh backup $i $BACKUP_BUCKET >> /var/log/snapshot_cron.log
                                         done
                                 fi
                         fi

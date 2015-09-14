@@ -18,8 +18,6 @@ SenzaInfo:
     - ApplicationId:
         Description: "The application id according to yourturn"
         Default: "stups-cassandra"
-    - MintBucket:
-        Description: "Your S3 bucket where mint will drop OAuth credentials"
     - BackupBucket:
         Description: "Your S3 Backup Bucket where your snapshots will be stored"
         Default: ""
@@ -44,9 +42,8 @@ SenzaComponents:
         MetricType: CPU
       TaupageConfig:
         root: true
-        mint_bucket: "{{Arguments.MintBucket}}"
         runtime: Docker
-        source: "pierone.stups.zalan.do/zaster/cassandra:{{Arguments.ImageVersion}}"
+        source: "os-registry.stups.zalan.do/mop/stups-cassandra:{{Arguments.ImageVersion}}"
         networking: host
         application_id: "{{Arguments.ApplicationId}}"
         etcd_discovery_domain: "{{Arguments.EtcdDomain}}"
@@ -113,18 +110,11 @@ Resources:
         ToPort: 22
         CidrIp: 0.0.0.0/0
 
-  # Automatically create roles (for Mint bucket reading).
+  # Automatically create roles.
   StupsCassandraRole:
     Type: AWS::IAM::Role
     Properties:
       Policies:
-      - PolicyName: CassandraMintRead
-        PolicyDocument:
-          Version: "2012-10-17"
-          Statement:
-          - Effect: Allow
-            Action: "s3:GetObject"
-            Resource: ["arn:aws:s3:::{{Arguments.MintBucket}}/{{Arguments.ApplicationId}}/*"]
       - PolicyName: CassandraSnapshotWrite
         PolicyDocument:
           Version: "2012-10-17"

@@ -37,7 +37,7 @@ defaults with values that better match your own requirements.
     +----------------+------------------------------------------------------------------+---------------------+
     | EtcdDomain     | Your etcd appliance domain name                                  | NONE                |
     | ClusterSize    | The initial size (number of nodes) for the new Cassandra cluster | 3                   |
-    | ImageVersion   | Cassandra docker image version (for ex. 2.1.8-p0)                | 2.1.8-p0            |
+    | ImageVersion   | Cassandra docker image version (for ex. 2.1.8-p0)                | 2.1.9-p0            |
     | OpsCenterIp    | Register to Opscenter using Ip address                           | Discover using etcd |
     | ScalyrKey      | The API key of Scalyr logging service used by Taupage            | Don't use Scalyr    |
     | ApplicationId  | The application id according to yourturn                         | stups-cassandra     |

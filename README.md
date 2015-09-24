@@ -24,7 +24,7 @@ Cassandra as a single volume for both data and commit logs.
 
 These instances are [suggested as adequate]
 (http://docs.datastax.com/en/cassandra/2.1/cassandra/install/installAMILaunch.html)
-for SSD production with light data.
+for production with light data.
 
 ## Parameters
 

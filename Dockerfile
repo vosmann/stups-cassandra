@@ -12,7 +12,7 @@ RUN curl -sL https://debian.datastax.com/debian/repo_key | apt-key add -
 RUN apt-get -y update && apt-get -y -o Dpkg::Options::='--force-confold' dist-upgrade
 RUN apt-get -y install curl libjna-java python wget jq datastax-agent sysstat
 
-ENV CASSIE_VERSION=2.1.8
+ENV CASSIE_VERSION=2.1.9
 ADD http://ftp.halifax.rwth-aachen.de/apache/cassandra/${CASSIE_VERSION}/apache-cassandra-${CASSIE_VERSION}-bin.tar.gz /tmp/
 # COPY apache-cassandra-${CASSIE_VERSION}-bin.tar.gz /tmp/
 

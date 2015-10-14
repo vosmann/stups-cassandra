@@ -10,7 +10,7 @@ provider, the [Etcd Seed Provider]
 (https://github.com/zalando/cassandra-etcd-seed-provider).
 
 The steps below explain how to get your own Cassandra cluster up and running.
-If you already have your own etcd appliance running this can be achieve with
+If you already have your own etcd appliance running this can be achieved with
 one single command!
 
 Additionaly, the cluster can register itself into an existing [STUPS Opscenter]
@@ -24,7 +24,7 @@ Cassandra as a single volume for both data and commit logs.
 
 These instances are [suggested as adequate]
 (http://docs.datastax.com/en/cassandra/2.1/cassandra/install/installAMILaunch.html)
-for SSD production with light data.
+for production with light data.
 
 ## Parameters
 
@@ -37,7 +37,7 @@ defaults with values that better match your own requirements.
     +----------------+------------------------------------------------------------------+---------------------+
     | EtcdDomain     | Your etcd appliance domain name                                  | NONE                |
     | ClusterSize    | The initial size (number of nodes) for the new Cassandra cluster | 3                   |
-    | ImageVersion   | Opscenter docker image version (for ex. 5.2.0-p0)                | 2.1.8-p0-SNAPSHOT   |
+    | ImageVersion   | Cassandra docker image version (for ex. 2.1.8-p0)                | 2.1.9-p0            |
     | OpsCenterIp    | Register to Opscenter using Ip address                           | Discover using etcd |
     | ScalyrKey      | The API key of Scalyr logging service used by Taupage            | Don't use Scalyr    |
     | ApplicationId  | The application id according to yourturn                         | stups-cassandra     |
@@ -82,8 +82,8 @@ and the nodes will discover the OpsCenter appliance and register there.
 
 If you're using Scalyr, one of the supported log shipping providers from Taupage, 
 you can specify your Scalyr API key and it will be used to ship your node logs.
-For this you specify the value of the ``ScalyrKey`` parameter. if you leave it 
-blank logs will be kept locally and you'll have to SSH into the nodes to check them.
+For this you specify the value of the ``ScalyrKey`` parameter. If you leave this parameter 
+blank, logs will be kept locally and you'll have to SSH into the nodes to check them.
 
 ### ApplicationId
 
@@ -94,16 +94,17 @@ application id.
 
 ## Howto
 
-Creating an instance of this appliance is very easy. You just need to provide 1
-parameter which is your etcd domain. Assuming your team's Hosted Zone is
+Creating an instance of this appliance is very easy. You just need to provide one 
+simple parameter which is your etcd domain. Assuming your team's Hosted Zone is
 ``fsociety.example.com`` and your etcd domain is ``etcd.fsociety.example.com``
-you would run senza like:
+you would run senza like this:
 
     senza create stups-cassandra.yaml cluster1 etcd.fsociety.example.com
     
 Where ``cluster1`` is the Stack version and it's also used as the name 
 for the new cluster.
 
+If you need additional help about senza you can [check the documentation](https://docs.stups.io/en/latest/components/senza.html#command-line-usage).
 
 ## Known issues
 

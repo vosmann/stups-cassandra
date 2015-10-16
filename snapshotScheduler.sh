@@ -1,6 +1,6 @@
 #!/bin/bash
 # Script to process backup and restore functionallity in AWS
-# Maintainer: Team Zaster (team-zaster@zalando.de)
+# Maintainer: malte.pickhan@zalando.de
 
 while [ -n "$BACKUP_BUCKET" ] ; do
                 #Get pattern from etcd and split into array

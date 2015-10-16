@@ -1,6 +1,6 @@
 #!/bin/bash
 # Script to process backup and restore functionallity in AWS
-# Maintainer: Team Zaster (team-zaster@zalando.de)
+# Maintainer: malte.pickhan@zalando.de
 backupFolder=$/var/cassandra/data/$keySpaceName/
 DATE=`date +%Y-%m-%d:%H:%M:%S`
 IP=$(curl -Ls -m 4 http://169.254.169.254/latest/meta-data/local-ipv4)

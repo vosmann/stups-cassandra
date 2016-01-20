@@ -42,9 +42,11 @@ then
     exit 1
 fi
 export AZ=$(curl -Ls -m 4 http://169.254.169.254/latest/meta-data/placement/availability-zone)
-echo "Data center: $DATA_DIR. Availability zone. $AZ. Writing cassandra-rackdc.properties."
+echo "Data center: $DATACENTER. Availability zone. $AZ. Writing cassandra-rackdc.properties."
 echo "dc=$DATACENTER" > /opt/cassandra/conf/cassandra-rackdc.properties
 echo "rack=$AZ" >> /opt/cassandra/conf/cassandra-rackdc.properties
+echo "cassandra-rackdc.properties:"
+cat /opt/cassandra/conf/cassandra-rackdc.properties
      
 export DATA_DIR=${DATA_DIR:-/var/cassandra/data}
 export COMMIT_LOG_DIR=${COMMIT_LOG_DIR:-/var/cassandra/data/commit_logs}
@@ -57,6 +59,9 @@ then
     echo "stomp_interface: $OPSCENTER" >> /var/lib/datastax-agent/conf/address.yaml
     echo "hosts: [\"$LISTEN_ADDRESS\"]" >> /var/lib/datastax-agent/conf/address.yaml
     echo "cassandra_conf: /opt/cassandra/conf/cassandra.yaml" >> /var/lib/datastax-agent/conf/address.yaml
+    echo "address.yaml:"
+    cat /var/lib/datastax-agent/conf/address.yaml
+
     echo "Starting OpsCenter agent in the background ..."
     service datastax-agent start > /dev/null
 fi

@@ -1,26 +1,26 @@
 SenzaInfo:
   StackName: cassandra
   Parameters:
-    - EtcdDomain:
-        Description: "Your etcd domain (e.g. etcd.cassandra.rocks.org)"
+    - ClusterName:
+        Description: "Cluster name"
     - ClusterSize:
         Description: "The initial size (number of nodes) for the new Cassandra cluster"
-        Default: "3"
-    - ImageVersion:
-        Description: "Which Image version to use (e.g. 2.1.8-p0)"
-        Default: "2.1.9-p0"
+    - DataCenter:
+        Description: "The name of the datacenter for cassandra-rackdc.properties."
+    - Image:
+        Description: "Which Image to use"
     - OpsCenterIp:
         Description: "Register to Opscenter using Ip address"
-        Default: ""
     - ScalyrKey:
         Description: "The API key of Scalyr logging service used by Taupage"
-        Default: ""
     - ApplicationId:
         Description: "The application id according to yourturn"
-        Default: "stups-cassandra"
-    - BackupBucket:
-        Description: "Your S3 Backup Bucket where your snapshots will be stored"
-        Default: ""
+    - SecurityGroup:
+        Description: "Security group with Cassandra ports open."
+    - Role:
+        Description: "A role with EBS permissions."
+    - Seeds:
+        Description: "Seed nodes' IPs."
 
 SenzaComponents:
 
@@ -29,13 +29,11 @@ SenzaComponents:
 
   - CassandraCluster:
       Type: Senza::TaupageAutoScalingGroup
-      InstanceType: "c3.2xlarge" # Has 2 80GB SSDs
+      InstanceType: c4.2xlarge # EBS-optimized
       SecurityGroups:
-        - Fn::GetAtt:
-          - StupsCassandraSg
-          - GroupId
+        - {{Arguments.SecurityGroup}}"
       IamRoles:
-        - Ref: StupsCassandraRole
+        - {{Arguments.Role}}"
       AutoScaling:
         Minimum: "{{Arguments.ClusterSize}}"
         Maximum: "{{Arguments.ClusterSize}}"
@@ -44,9 +42,9 @@ SenzaComponents:
         root: true
         runtime: Docker
         networking: host
-        source: "registry.opensource.zalan.do/mop/stups-cassandra:{{Arguments.ImageVersion}}"
+        source: "{{Arguments.Image}}"
         application_id: "{{Arguments.ApplicationId}}"
-        etcd_discovery_domain: "{{Arguments.EtcdDomain}}"
+        # etcd_discovery_domain: "{{Arguments.EtcdDomain}}"
         scalyr_account_key: "{{Arguments.ScalyrKey}}"
         # http://docs.datastax.com/en/opscenter/5.0/opsc/reference/opscPorts_r.html
         ports:
@@ -56,89 +54,32 @@ SenzaComponents:
           9042: 9042
           9160: 9160
           61621: 61621
+
+        # Taupage's ec2.get_all_volumes(status=available) might lead to disk mixup
+        # if two or more instances attempt to reattach their volumes at the same time.
         volumes:
-          raid:
-            /dev/md/cassandra:
-              level: 0
-              devices:
-                - /dev/xvdb
-                - /dev/xvdc
+          ebs:
+            /dev/xvdf: cassandra-data-volume
+            /dev/xvdg: cassandra-commitlog-volume
+        # To be prepared beforehand
         mounts:
-          /tmp:
+          /var/cassandra/data/data:
+            partition: /dev/xvdf
             erase_on_boot: false
-          /var/cassandra:
-            partition: /dev/md/cassandra
             filesystem: ext4
-            erase_on_boot: true
+          /var/cassandra/data/commitlog:
+            partition: /dev/xvdg
+            erase_on_boot: false
+            filesystem: ext4
 
         environment:
-          CLUSTER_NAME: "{{SenzaInfo.StackVersion}}"
-          CLUSTER_SIZE: "{{Arguments.ClusterSize}}"
+          CLUSTER_NAME: "{{Arguments.ClusterName}}"
+          DATACENTER: "{{Arguments.DataCenter}}"
           OPSCENTER: "{{Arguments.OpsCenterIp}}"
           TTL: 120
-          BACKUP_BUCKET: "{{Arguments.BackupBucket}}"
           APPLICATION_ID: "{{Arguments.ApplicationId}}"
+          DATA_DIR: /var/cassandra/data/data
+          COMMIT_LOG_DIR: /var/cassandra/data/commitlog
+          SNITCH: GossipingPropertyFileSnitch
+          SEEDS: "{{Arguments.Seeds}}"
 
-
-Resources:
-  StupsCassandraSg:
-    Type: AWS::EC2::SecurityGroup
-    Properties:
-      GroupDescription: Cassandra node ports
-      SecurityGroupIngress:
-      - IpProtocol: tcp # Client CQL
-        FromPort: 9042
-        ToPort: 9042
-        CidrIp: 0.0.0.0/0
-      - IpProtocol: tcp # Client Thrift
-        FromPort: 9160
-        ToPort: 9160
-        CidrIp: 0.0.0.0/0
-      - IpProtocol: tcp # Cassandra inter-node communication
-        FromPort: 7000
-        ToPort: 7000
-        CidrIp: 0.0.0.0/0
-      - IpProtocol: tcp # JMX from everywhere
-        FromPort: 7199
-        ToPort: 7199
-        CidrIp: 0.0.0.0/0
-      - IpProtocol: tcp #Jolokia Agent
-        FromPort: 8778
-        ToPort: 8778
-        CidrIp: 0.0.0.0/0
-      - IpProtocol: tcp # Agent receiving traffic from OpsCenter
-        FromPort: 61621
-        ToPort: 61621
-        CidrIp: 0.0.0.0/0
-      - IpProtocol: tcp # SSH
-        FromPort: 22
-        ToPort: 22
-        CidrIp: 0.0.0.0/0
-
-  # Automatically create roles.
-  StupsCassandraRole:
-    Type: AWS::IAM::Role
-    Properties:
-      Policies:
-      - PolicyName: CassandraSnapshotWrite
-        PolicyDocument:
-          Version: "2012-10-17"
-          Statement:
-          - Effect: Allow
-            Action: "s3:PutObject"
-            Resource: ["arn:aws:s3:::{{Arguments.BackupBucket}}/{{Arguments.ApplicationId}}-snapshot/*"] 
-      - PolicyName: CassandraSnapshotListBucket
-        PolicyDocument:
-          Version: "2012-10-17"
-          Statement:
-          - Effect: Allow
-            Action: "s3:ListBucket"
-            Resource: ["arn:aws:s3:::{{Arguments.BackupBucket}}"] 
-      AssumeRolePolicyDocument:
-        Version: "2012-10-17"
-        Statement:
-        - Effect: Allow
-          Principal:
-            Service: ec2.amazonaws.com
-          Action: sts:AssumeRole
-      Path: /

@@ -5,6 +5,8 @@
 #   full explanations of configuration directives
 # /NOTE
 
+auto_bootstrap: false
+
 # The name of the cluster. This is mainly used to prevent machines in
 # one logical cluster from joining another.
 cluster_name: '$CLUSTER_NAME'
@@ -251,10 +253,9 @@ seed_provider:
     # Cassandra nodes use this list of hosts to find each other and learn
     # the topology of the ring.  You must change this if you are running
     # multiple nodes!
-    - class_name: org.zalando.cassandra.locator.EtcdSeedProvider
+    - class_name: org.apache.cassandra.locator.SimpleSeedProvider
       parameters:
-          # You can use the env vars ETCD_URL and CLUSTER_NAME
-          - url: ${ETCD_URL}/v2/keys/cassandra/${CLUSTER_NAME}/seeds
+        - seeds: "${SEEDS}"
 
 # For workloads with more data than can fit in memory, Cassandra's
 # bottleneck will be reads that need to fetch data from

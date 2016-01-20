@@ -23,8 +23,10 @@ RUN md5sum --check /tmp/apache-cassandra-${CASSIE_VERSION}-bin.tar.gz.md5
 RUN tar -xzf /tmp/apache-cassandra-${CASSIE_VERSION}-bin.tar.gz -C /opt && ln -s /opt/apache-cassandra-${CASSIE_VERSION} /opt/cassandra
 RUN rm -f /tmp/apache-cassandra-${CASSIE_VERSION}-bin.tar.gz*
 
-RUN mkdir -p /var/cassandra/data
-RUN mkdir -p /opt/jolokia/
+RUN mkdir -p /var/cassandra/data/data && chmod 0777 /var/cassandra/data/data
+RUN mkdir -p /var/cassandra/data/commitlog && chmod 0777 /var/cassandra/data/commitlog
+RUN chmod 0777 /var/cassandra
+RUN mkdir -p /opt/jolokia/ && chmod 0777 /opt/jolokia
 
 ADD http://search.maven.org/remotecontent?filepath=org/jolokia/jolokia-jvm/1.3.1/jolokia-jvm-1.3.1-agent.jar /opt/jolokia/jolokia-jvm-agent.jar
 RUN echo "ca7c3eab12c8c3c5227d6fb4e51984bc /opt/jolokia/jolokia-jvm-agent.jar" > /tmp/jolokia-jvm-agent.jar.md5
@@ -54,4 +56,5 @@ RUN touch /var/log/snapshot_cron.log && chmod 0777 /var/log/snapshot_cron.log
 
 COPY supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 
-CMD ["/usr/bin/supervisord"]
+CMD /opt/cassandra/bin/stups-cassandra.sh
+

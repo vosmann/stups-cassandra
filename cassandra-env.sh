@@ -174,7 +174,7 @@ JMX_PORT="7199"
 JVM_OPTS="$JVM_OPTS -ea"
 
 # add the jamm javaagent
-JVM_OPTS="$JVM_OPTS -javaagent:$CASSANDRA_HOME/lib/jamm-0.3.0.jar"
+JVM_OPTS="$JVM_OPTS -javaagent:$CASSANDRA_HOME/lib/jamm-0.2.5.jar"
 JVM_OPTS="$JVM_OPTS -javaagent:/opt/jolokia/jolokia-jvm-agent.jar=port=8778,host=$LISTEN_ADDRESS"
 
 

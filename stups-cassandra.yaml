@@ -31,9 +31,9 @@ SenzaComponents:
       Type: Senza::TaupageAutoScalingGroup
       InstanceType: c4.2xlarge # EBS-optimized
       SecurityGroups:
-        - {{Arguments.SecurityGroup}}"
+        - "{{Arguments.SecurityGroup}}"
       IamRoles:
-        - {{Arguments.Role}}"
+        - "{{Arguments.Role}}"
       AutoScaling:
         Minimum: "{{Arguments.ClusterSize}}"
         Maximum: "{{Arguments.ClusterSize}}"

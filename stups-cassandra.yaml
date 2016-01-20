@@ -21,6 +21,8 @@ SenzaInfo:
         Description: "A role with EBS permissions."
     - Seeds:
         Description: "Seed nodes' IPs."
+    - MintBucket:
+        Description: "Mint bucket to get image from Pierone."
 
 SenzaComponents:
 
@@ -44,7 +46,7 @@ SenzaComponents:
         networking: host
         source: "{{Arguments.Image}}"
         application_id: "{{Arguments.ApplicationId}}"
-        # etcd_discovery_domain: "{{Arguments.EtcdDomain}}"
+        mint_bucket: "{{Arguments.MintBucket}}"
         scalyr_account_key: "{{Arguments.ScalyrKey}}"
         # http://docs.datastax.com/en/opscenter/5.0/opsc/reference/opscPorts_r.html
         ports:

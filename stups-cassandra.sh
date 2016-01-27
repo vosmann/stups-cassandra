@@ -56,14 +56,14 @@ echo "Finished bootstrapping node."
 if [ -n "$OPSCENTER" ] ;
 then
     echo "Configuring OpsCenter agent ..."
-    echo "stomp_interface: $OPSCENTER" >> /var/lib/datastax-agent/conf/address.yaml
+    echo "stomp_interface: $OPSCENTER" > /var/lib/datastax-agent/conf/address.yaml
     echo "hosts: [\"$LISTEN_ADDRESS\"]" >> /var/lib/datastax-agent/conf/address.yaml
     echo "cassandra_conf: /opt/cassandra/conf/cassandra.yaml" >> /var/lib/datastax-agent/conf/address.yaml
     echo "address.yaml:"
     cat /var/lib/datastax-agent/conf/address.yaml
 
     echo "Starting OpsCenter agent in the background ..."
-    service datastax-agent start > /dev/null
+    service datastax-agent restart > /dev/null
 fi
 
 echo "Generating configuration from template ..."

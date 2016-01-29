@@ -63,7 +63,7 @@ then
     cat /var/lib/datastax-agent/conf/address.yaml
 
     echo "Starting OpsCenter agent in the background ..."
-    service datastax-agent restart > /dev/null
+    service datastax-agent restart
 fi
 
 echo "Generating configuration from template ..."
